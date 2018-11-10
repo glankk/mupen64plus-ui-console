@@ -83,7 +83,7 @@
       <WarningLevel>Level3</WarningLevel>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>..\..\..\mupen64plus-win32-deps\SDL2-2.0.10\lib\x86\SDL2main.lib;..\..\..\mupen64plus-win32-deps\SDL2-2.0.10\lib\x86\SDL2.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>..\..\..\mupen64plus-win32-deps\SDL2-2.0.10\lib\x86\SDL2main.lib;..\..\..\mupen64plus-win32-deps\SDL2-2.0.10\lib\x86\SDL2.lib;Ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
     </Link>
@@ -111,7 +111,7 @@ copy ..\..\..\mupen64plus-win32-deps\zlib-1.2.11\lib\x86\*.dll "$(OutDir)"
       <WarningLevel>Level3</WarningLevel>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>..\..\..\mupen64plus-win32-deps\SDL2-2.0.10\lib\x64\SDL2main.lib;..\..\..\mupen64plus-win32-deps\SDL2-2.0.10\lib\x64\SDL2.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>..\..\..\mupen64plus-win32-deps\SDL2-2.0.10\lib\x64\SDL2main.lib;..\..\..\mupen64plus-win32-deps\SDL2-2.0.10\lib\x64\SDL2.lib;Ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
     </Link>
@@ -140,7 +140,7 @@ copy ..\..\..\mupen64plus-win32-deps\zlib-1.2.11\lib\x64\*.dll "$(OutDir)"
       <IntrinsicFunctions>true</IntrinsicFunctions>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>..\..\..\mupen64plus-win32-deps\SDL2-2.0.10\lib\x86\SDL2main.lib;..\..\..\mupen64plus-win32-deps\SDL2-2.0.10\lib\x86\SDL2.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>..\..\..\mupen64plus-win32-deps\SDL2-2.0.10\lib\x86\SDL2main.lib;..\..\..\mupen64plus-win32-deps\SDL2-2.0.10\lib\x86\SDL2.lib;Ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
@@ -172,7 +172,7 @@ copy ..\..\..\mupen64plus-win32-deps\zlib-1.2.11\lib\x86\*.dll "$(OutDir)"
       <IntrinsicFunctions>true</IntrinsicFunctions>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>..\..\..\mupen64plus-win32-deps\SDL2-2.0.10\lib\x64\SDL2main.lib;..\..\..\mupen64plus-win32-deps\SDL2-2.0.10\lib\x64\SDL2.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>..\..\..\mupen64plus-win32-deps\SDL2-2.0.10\lib\x64\SDL2main.lib;..\..\..\mupen64plus-win32-deps\SDL2-2.0.10\lib\x64\SDL2.lib;Ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>

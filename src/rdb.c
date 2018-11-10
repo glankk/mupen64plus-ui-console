@@ -29,7 +29,6 @@ typedef int socklen_t;
 # include <netdb.h>
 # include <sys/ioctl.h>
 # include <sys/socket.h>
-# include <sys/types.h>
 # include <termios.h>
 # include <unistd.h>
 # if defined(__FreeBSD__) || defined(__OpenBSD__)
@@ -138,6 +137,9 @@ static void cleanup(void)
             memset(&rdb_bkp_list[i], 0, sizeof(rdb_bkp_list[i]));
         }
     }
+    (*DebugSetCallbacks)(NULL, NULL, NULL);
+    (*DebugSetRunState)(M64P_DBG_RUNSTATE_RUNNING);
+    (*DebugStep)();
 }
 
 static void die(const char *note, int errtype)
@@ -225,7 +227,11 @@ static _Bool rdb_peek(void)
 {
     if (rdb_ibuf_pos != rdb_ibuf_size)
         return 1;
+#ifndef _WIN32
+    int nread;
+#else
     u_long nread;
+#endif
     if (ioctl(cl, FIONREAD, &nread))
         die("ioctl()", 4);
     return nread != 0;
@@ -542,16 +548,31 @@ static void rdb_set_reg(int reg_idx, uint64_t value)
     }
 }
 
+static void frontend_init(void)
+{
+}
+
 static void frontend_update(unsigned int pc)
 {
     if (rdb_running)
         cpu_stopped = 1;
 }
 
+static void frontend_vi(void)
+{
+}
+
 static int rdb_main(void *arg)
 {
     if (setjmp(rdb_jmp))
         return -1;
+
+    rdb_running = 0;
+    cpu_stopped = 0;
+    m64p_errno = (*DebugSetCallbacks)(frontend_init, frontend_update,
+                                      frontend_vi);
+    if (m64p_errno)
+        die("DebugSetCallbacks()", 5);
 
     rdb_noack = 0;
     rdb_stopcode = SIGTRAP;
@@ -887,10 +908,6 @@ static int rdb_main(void *arg)
 
     cleanup();
 
-    (*DebugSetCallbacks)(NULL, NULL, NULL);
-    (*DebugSetRunState)(M64P_DBG_RUNSTATE_RUNNING);
-    (*DebugStep)();
-
     return 0;
 }
 
@@ -899,16 +916,12 @@ int rdb_start(const char *addr)
     if (rdb_thread)
         return -1;
     rdb_detach = 0;
-    rdb_running = 0;
-    cpu_stopped = 0;
 #if SDL_VERSION_ATLEAST(2,0,0)
     rdb_thread = SDL_CreateThread(rdb_main, "rdb", (void*)addr);
 #else
     rdb_thread = SDL_CreateThread(rdb_main, (void*)addr);
 #endif
     if (!rdb_thread)
-        return -1;
-    if ((*DebugSetCallbacks)(NULL, frontend_update, NULL))
         return -1;
     return 0;
 }
