@@ -73,13 +73,14 @@ WARNFLAGS ?= -Wall
 
 CFLAGS += $(OPTFLAGS) $(WARNFLAGS) -ffast-math -fno-strict-aliasing -I../../src
 ifeq ($(OS), MINGW)
-  CFLAGS += -lpthread
-  LDLIBS += -lpthread
+  CFLAGS += -lpthread -lWs2_32
+  LDLIBS += -lpthread -lWs2_32
 else
   ifneq ($(OS), OSX)
     CFLAGS += -pthread
     LDLIBS += -pthread
   endif
+  LDLIBS += -lutil
 endif
 
 # set special flags per-system
@@ -244,7 +245,8 @@ SOURCE = \
 	$(SRCDIR)/core_interface.c \
 	$(SRCDIR)/debugger.c \
 	$(SRCDIR)/main.c \
-	$(SRCDIR)/plugin.c
+	$(SRCDIR)/plugin.c \
+	$(SRCDIR)/rdb.c
 
 ifeq ($(OS), MINGW)
 SOURCE += \

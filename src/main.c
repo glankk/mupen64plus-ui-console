@@ -43,6 +43,7 @@
 #include "osal_preproc.h"
 #include "osal_files.h"
 #include "plugin.h"
+#include "rdb.h"
 #include "version.h"
 
 #ifdef VIDEXT_HEADER
@@ -68,6 +69,7 @@ static const char *l_CoreLibPath = NULL;
 static const char *l_ConfigDirPath = NULL;
 static const char *l_ROMFilepath = NULL;       // filepath of ROM to load & run at startup
 static const char *l_SaveStatePath = NULL;     // save state to load at startup
+static const char *l_RDBAddress = NULL;
 
 #if defined(SHAREDIR)
   static const char *l_DataDirPath = SHAREDIR;
@@ -80,6 +82,7 @@ static int   l_TestShotIdx = 0;          // index of next screenshot frame in li
 static int   l_SaveOptions = 1;          // save command-line options in configuration file (enabled by default)
 static int   l_CoreCompareMode = 0;      // 0 = disable, 1 = send, 2 = receive
 static int   l_LaunchDebugger = 0;
+static int   l_LaunchRDB = 0;
 
 static eCheatMode l_CheatMode = CHEAT_DISABLE;
 static char      *l_CheatNumList = NULL;
@@ -371,6 +374,7 @@ static void printUsage(const char *progname)
            "    --configdir (dir)      : force configation directory to (dir); should contain mupen64plus.cfg\n"
            "    --datadir (dir)        : search for shared data files (.ini files, languages, etc) in (dir)\n"
            "    --debug                : launch console-based debugger (requires core lib built for debugging)\n"
+           "    --rdb (address)        : launch gdb server (requires core lib built for debugging)\n"
            "    --plugindir (dir)      : search for plugins in (dir)\n"
            "    --sshotdir (dir)       : set screenshot directory to (dir)\n"
            "    --gfx (plugin-spec)    : use gfx plugin given by (plugin-spec)\n"
@@ -399,6 +403,10 @@ static void printUsage(const char *progname)
            "    'all'                  : enable all of the available cheat codes\n"
            "    (codelist)             : a comma-separated list of cheat code numbers to enable,\n"
            "                             with dashes to use code variables (ex 1-2 to use cheat 1 option 2)\n"
+           "(address):\n"
+           "    'pty:<pty-link>'       : open a new pty, create a symlink at <pty-link>\n"
+           "    'tcp:[<host>]:<port>'  : listen for a tcp connection on <host> (leave empty for wildcard) and <port>\n"
+           "    'udp:[<host>]:<port>'  : bind a udp socket to <host> (leave empty for wildcard) and <port>\n"
            "\n", progname);
 
     return;
@@ -700,6 +708,12 @@ static m64p_error ParseCommandLineMain(int argc, const char **argv)
         {
             l_LaunchDebugger = 1;
         }
+        else if (strcmp(argv[i], "--rdb") == 0 && ArgsLeft >= 1)
+        {
+            l_LaunchRDB = 1;
+            l_RDBAddress = argv[i+1];
+            i++;
+        }
         else if (strcmp(argv[i], "--core-compare-send") == 0)
         {
             l_CoreCompareMode = 1;
@@ -748,6 +762,11 @@ static m64p_error ParseCommandLineMain(int argc, const char **argv)
             DebugMessage(M64MSG_WARNING, "unrecognized command-line parameter '%s'", argv[i]);
         }
         /* continue argv loop */
+    }
+
+    if (l_LaunchDebugger && l_LaunchRDB) {
+        DebugMessage(M64MSG_ERROR, "both --debug and --rdb specified, pick one!");
+        return M64ERR_INPUT_INVALID;
     }
 
     /* missing ROM filepath */
@@ -1111,8 +1130,28 @@ int main(int argc, char *argv[])
     if (l_SaveOptions && (*ConfigHasUnsavedChanges)(NULL))
         (*ConfigSaveFile)();
 
+    /* launch rdb server */
+    if (l_LaunchRDB)
+    {
+        if (rdb_start(l_RDBAddress))
+        {
+            DebugMessage(M64MSG_ERROR, "couldn't attach rdb.");
+            (*CoreDoCommand)(M64CMD_ROM_CLOSE, 0, NULL);
+            (*CoreShutdown)();
+            DetachCoreLib();
+            return 14;
+        }
+        /* Set Core config parameter to enable debugger */
+        int bEnableDebugger = 1;
+        (*ConfigSetParameter)(l_ConfigCore, "EnableDebugger", M64TYPE_BOOL, &bEnableDebugger);
+    }
+
     /* run the game */
     (*CoreDoCommand)(M64CMD_EXECUTE, 0, NULL);
+
+    /* stop rdb server */
+    if (l_LaunchRDB)
+      rdb_stop();
 
     /* detach plugins from core and unload them */
     for (i = 0; i < 4; i++)

@@ -201,6 +201,7 @@ copy ..\..\..\mupen64plus-win32-deps\zlib-1.2.11\lib\x64\*.dll "$(OutDir)"
     <ClCompile Include="..\..\src\osal_dynamiclib_win32.c" />
     <ClCompile Include="..\..\src\osal_files_win32.c" />
     <ClCompile Include="..\..\src\plugin.c" />
+    <ClCompile Include="..\..\src\rdb.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\cheat.h" />
@@ -212,6 +213,7 @@ copy ..\..\..\mupen64plus-win32-deps\zlib-1.2.11\lib\x64\*.dll "$(OutDir)"
     <ClInclude Include="..\..\src\osal_files.h" />
     <ClInclude Include="..\..\src\osal_preproc.h" />
     <ClInclude Include="..\..\src\plugin.h" />
+    <ClInclude Include="..\..\src\rdb.h" />
     <ClInclude Include="..\..\src\version.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
